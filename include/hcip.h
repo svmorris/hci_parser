@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: MIT
+
+
+#ifndef HCI_PARSE_HEADER
+
 #include <stdint.h>
-
-
+#include <unistd.h>
 
 // =========================== Spec Defined Constants ===========================
 /*
@@ -20,8 +24,8 @@ typedef enum {
  * HCI Event packet types.
  */
 typedef enum {
-    EVT_CMD_COMPLETE,
-    EVT_CMD_STATUS,
+    EVT_CMD_COMPLETE = 0x0e,
+    EVT_CMD_STATUS   = 0x0f,
 }hci_event_type;
 
 
@@ -138,3 +142,24 @@ typedef struct {
         hci_event_pkt event_pkt;
     } u;
 }hci_pkt;
+
+
+
+
+
+// =========================== Exposed Functions ===========================
+
+
+typedef enum {
+    PARSE_OK = 0,      // Correctly parsed pkt.
+    PARSE_UNSUPPORTED, // Correct, but unsupported features.
+    PARSE_TRUNCATED,   // In complete buffer.
+    PARSE_INVALID,     // Invalid HCI packets.
+    PARSE_EINVAL,      // User error.
+    PARSE_ERROR,       // Internal parser error.
+}parse_error_codes;
+
+
+int parse_hci(uint8_t *buffer, size_t buf_len, hci_pkt pkt);
+
+#endif
